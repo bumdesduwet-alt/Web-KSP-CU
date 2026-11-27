@@ -1,0 +1,124 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", Georgia, Cambria, "Times New Roman", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --color-navy-950: #061326;
+  --color-navy-900: #0b1f3a;
+  --color-navy-800: #132d54;
+  --color-navy-700: #1e3a6d;
+  --color-gold-600: #9a7212;
+  --color-gold-500: #c59b27;
+  --color-gold-400: #d9b44a;
+  --color-gold-100: #f9f1d8;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    font-family: var(--font-sans);
+  }
+
+  h1, h2, h3 {
+    text-wrap: balance;
+  }
+
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@keyframes marquee-left {
+  0% {
+    transform: translate3d(0%, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.animate-marquee-left {
+  display: flex;
+  width: max-content;
+  animation: marquee-left 32s linear infinite;
+  will-change: transform;
+}
+
+.marquee-container:hover .animate-marquee-left {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Mode Lansia: Huruf standar jelas, ukuran nyaman dibaca, kontras tinggi */
+html.senior-mode {
+  font-size: 18px;
+  --font-sans: Arial, Helvetica, "Segoe UI", system-ui, sans-serif;
+  --font-serif: Arial, Helvetica, "Segoe UI", system-ui, sans-serif;
+  --font-mono: Arial, Helvetica, "Segoe UI", system-ui, sans-serif;
+}
+
+html.senior-mode body {
+  font-family: var(--font-sans);
+  line-height: 1.65;
+  letter-spacing: 0.005em;
+}
+
+html.senior-mode h1,
+html.senior-mode h2,
+html.senior-mode h3,
+html.senior-mode h4,
+html.senior-mode p,
+html.senior-mode li,
+html.senior-mode a,
+html.senior-mode button,
+html.senior-mode input,
+html.senior-mode textarea,
+html.senior-mode select,
+html.senior-mode blockquote {
+  font-family: Arial, Helvetica, "Segoe UI", system-ui, sans-serif;
+  font-style: normal;
+}
+
+html.senior-mode .text-xs {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+html.senior-mode :is(.text-slate-500, .text-slate-600):not(:is(.bg-navy-900, .bg-navy-950, .bg-navy-800) *) {
+  color: #1e293b;
+}
+
+html.senior-mode input,
+html.senior-mode textarea,
+html.senior-mode select {
+  border-color: #64748b;
+  color: #0f172a;
+  min-height: 46px;
+}
+
+html.senior-mode .animate-marquee-left {
+  animation: none;
+  width: 100%;
+}
+
+html.senior-mode .marquee-primary {
+  white-space: normal;
+  padding-right: 0;
+}
+
+html.senior-mode .marquee-duplicate {
+  display: none;
+}
+

@@ -1,0 +1,6 @@
+{
+  "name": "KSP CU Argomanunggal Santosa",
+  "description": "Portal resmi KSP CU Argomanunggal Santosa — informasi layanan simpan pinjam, produk UMKM anggota, berita koperasi, galeri kegiatan, dan keanggotaan di Prambanan, Sleman, Yogyakarta.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
