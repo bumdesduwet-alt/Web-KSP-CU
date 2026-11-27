@@ -1,13 +1,47 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, LogIn, LogOut, ShieldAlert, ShieldCheck } from 'lucide-react';
+import {
+  ArrowLeft,
+  Check,
+  Copy,
+  ExternalLink,
+  LogIn,
+  LogOut,
+  ShieldAlert,
+  ShieldCheck,
+} from 'lucide-react';
+import firebaseConfig from '../../../firebase-applet-config.json';
 import { useAuth } from '../../context/AuthContext';
 import { useSiteData } from '../../context/SiteDataContext';
 
 export const AdminLoginScreen: React.FC = () => {
-  const { user, isAdmin, loading, authError, loginWithGoogle, logout } =
-    useAuth();
+  const {
+    user,
+    isAdmin,
+    loading,
+    authError,
+    authErrorCode,
+    loginWithGoogle,
+    loginWithRedirect,
+    logout,
+  } = useAuth();
   const { siteSettings } = useSiteData();
+  const [copiedDomain, setCopiedDomain] = useState(false);
+
+  const currentHost =
+    typeof window !== 'undefined' ? window.location.hostname : '';
+  const firebaseAuthSettingsUrl = `https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/settings`;
+
+  const handleCopyDomain = async () => {
+    if (!currentHost || !navigator.clipboard) return;
+    try {
+      await navigator.clipboard.writeText(currentHost);
+      setCopiedDomain(true);
+      setTimeout(() => setCopiedDomain(false), 2000);
+    } catch {
+      // Abaikan jika clipboard ditolak browser
+    }
+  };
 
   return (
     <div className="min-h-screen bg-navy-950 flex items-center justify-center p-4 sm:p-6">
@@ -26,8 +60,58 @@ export const AdminLoginScreen: React.FC = () => {
         </div>
 
         {authError && (
-          <div className="p-3.5 rounded-lg bg-red-50 border border-red-200 text-xs text-red-800">
-            {authError}
+          <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-xs text-red-900 space-y-3">
+            <p className="font-semibold leading-relaxed">{authError}</p>
+
+            {authErrorCode === 'auth/unauthorized-domain' && currentHost && (
+              <div className="pt-2 border-t border-red-200 space-y-2 text-red-800">
+                <p className="font-semibold">
+                  Cara Mengaktifkan Login di Domain Netlify:
+                </p>
+                <ol className="list-decimal list-inside space-y-1 leading-relaxed">
+                  <li>
+                    Salin domain website ini:{' '}
+                    <span className="font-mono font-semibold bg-white px-1.5 py-0.5 rounded border border-red-200">
+                      {currentHost}
+                    </span>
+                  </li>
+                  <li>
+                    Buka <strong>Firebase Console &rarr; Authentication &rarr; Settings &rarr; Authorized domains</strong>.
+                  </li>
+                  <li>
+                    Klik <strong>Add domain</strong>, tempel domain tersebut, lalu simpan dan muat ulang halaman ini.
+                  </li>
+                </ol>
+                <div className="flex flex-wrap gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => void handleCopyDomain()}
+                    className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-white border border-red-300 rounded-lg font-semibold text-red-900 hover:bg-red-100/50"
+                  >
+                    {copiedDomain ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-emerald-700" />
+                        <span>Tersalin</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" />
+                        <span>Salin Domain</span>
+                      </>
+                    )}
+                  </button>
+                  <a
+                    href={firebaseAuthSettingsUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-red-800 text-white rounded-lg font-semibold hover:bg-red-900"
+                  >
+                    <span>Buka Firebase Auth Settings</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -56,14 +140,25 @@ export const AdminLoginScreen: React.FC = () => {
             </button>
           </div>
         ) : (
-          <button
-            type="button"
-            onClick={() => void loginWithGoogle()}
-            className="w-full inline-flex items-center justify-center gap-2.5 px-5 py-3 bg-navy-900 text-white text-sm font-semibold rounded-lg hover:bg-navy-800 transition-colors"
-          >
-            <LogIn className="w-4 h-4" />
-            <span>Masuk dengan Akun Google Admin</span>
-          </button>
+          <div className="space-y-2.5">
+            <button
+              type="button"
+              onClick={() => void loginWithGoogle()}
+              className="w-full inline-flex items-center justify-center gap-2.5 px-5 py-3 bg-navy-900 text-white text-sm font-semibold rounded-lg hover:bg-navy-800 transition-colors"
+            >
+              <LogIn className="w-4 h-4" />
+              <span>Masuk dengan Akun Google Admin</span>
+            </button>
+            {authErrorCode === 'auth/popup-blocked' && (
+              <button
+                type="button"
+                onClick={() => void loginWithRedirect()}
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-slate-300 text-navy-900 text-xs font-semibold rounded-lg hover:bg-slate-50 transition-colors"
+              >
+                <span>Alternatif: Masuk Mode Redirect (Tanpa Popup)</span>
+              </button>
+            )}
+          </div>
         )}
 
         <div className="pt-4 border-t border-slate-200 flex items-center justify-between text-xs">
